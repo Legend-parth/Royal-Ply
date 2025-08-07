@@ -38,7 +38,7 @@ class SmoothScrollManager {
   private lastTime = 0;
   private lastPosition = 0;
   private rafId: number | null = null;
-  private wheelTimeout: NodeJS.Timeout | null = null;
+  private wheelTimeout: ReturnType<typeof setTimeout> | null = null;
 
   private constructor() {
     this.init();
