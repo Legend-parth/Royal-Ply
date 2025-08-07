@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { deviceCapabilityDetector } from '../utils/DeviceCapabilityDetector';
 import { animate, stagger, createTimeline, onScroll } from 'animejs';
+import videoSrc from '../media/PlyStrongLiveLong.mp4';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -687,7 +688,7 @@ const HeroSection: React.FC = () => {
               }}
               >
               <video 
-                src="/src/media/PlyStrongLiveLong.mp4" 
+                src={videoSrc} 
                 className="video-content"
                 autoPlay 
                 loop 
