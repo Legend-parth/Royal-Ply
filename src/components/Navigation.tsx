@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
+import { motion } from 'framer-motion';
+import logo from '../media/RoyalEnterprises.jpg';
 
 const Navigation: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -47,69 +49,73 @@ const Navigation: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
+  // Add logo import
+
+
   return (
     <>
-      <nav className={`nav-container fixed top-0 left-0 right-0 z-50 transition-all duration-700 ease-out glass-nav ${
-        isScrolled ? 'scrolled' : ''
-      }`}>
-        <div className="container mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            
-            {/* Logo */}
-            <div className="nav-link">
-              <Link to="/" className="flex items-center space-x-3 interactive">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
-                  </svg>
-                </div>
-                <span className="text-xl font-bold glow-text font-orbitron">WoodCraft</span>
-              </Link>
-            </div>
-            
-            {/* Desktop Navigation Items */}
-            <div className="desktop-nav hidden md:flex items-center space-x-8">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`nav-link interactive text-white hover:text-indigo-400 transition-all duration-300 font-medium ${
-                    location.pathname === item.href ? 'text-indigo-400' : ''
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-            
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <button 
-                className={`mobile-nav-toggle interactive ${isMobileMenuOpen ? 'active' : ''}`}
-                onClick={toggleMobileMenu}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'glass-nav scrolled rounded-3xl mx-8 my-4 shadow-xl' : 'glass-nav full-width'}`}
+      >
+        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+          {/* Added Logo with cool animation */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="logo-container"
+            style={{
+              mixBlendMode: 'screen',
+              filter: 'drop-shadow(0 0 10px rgba(147, 51, 234, 0.5))'
+            }}
+          >
+            <Link to="/">
+              <img 
+                src={logo} 
+                alt="Royal Enterprises" 
+                className="h-10 w-auto object-contain transition-transform hover:scale-110"
+              />
+            </Link>
+          </motion.div>
+          
+          {/* Desktop Menu */}
+          <div className="hidden lg:flex space-x-8">
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`nav-link text-gray-300 hover:text-white transition-colors ${location.pathname === item.href ? 'text-white font-bold' : ''}`}
               >
-                <span></span>
-                <span></span>
-                <span></span>
-              </button>
-            </div>
+                {item.name}
+              </Link>
+            ))}
           </div>
+          
+          {/* Mobile Menu Button */}
+          <button
+            className="lg:hidden text-white"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+        
+        {/* Mobile Menu */}
+        <div className={`mobile-nav-menu ${isMobileMenuOpen ? 'active' : ''}`}>
+          {navItems.map((item) => (
+            <Link
+              key={item.name}
+              to={item.href}
+              className="mobile-nav-link"
+              onClick={closeMobileMenu}
+            >
+              {item.name}
+            </Link>
+          ))}
         </div>
       </nav>
-
-      {/* Mobile Navigation Menu */}
-      <div className={`mobile-nav-menu ${isMobileMenuOpen ? 'active' : ''}`}>
-        {navItems.map((item) => (
-          <Link
-            key={item.name}
-            to={item.href}
-            className="mobile-nav-link"
-            onClick={closeMobileMenu}
-          >
-            {item.name}
-          </Link>
-        ))}
-      </div>
     </>
   );
 };

@@ -203,3 +203,8 @@ const EnhancedCustomCursor: React.FC = () => {
 };
 
 export default EnhancedCustomCursor;
+// Remove the unused cursorStyle declaration
+// const cursorStyle = { ... }; // This line is removed
+const cursorStyle: React.CSSProperties = {
+    zIndex: 9999,  // Ensure it's above all elements
+};

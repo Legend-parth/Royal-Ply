@@ -65,7 +65,7 @@ function App() {
           {isReady && (
             <>
               {settings.features.customCursor && <EnhancedCustomCursor />}
-              <PrecisionWoodCutterScrollbar />
+              <PrecisionWoodCutterScrollbar />  // Keep this; remove others if unused
               {settings.features.backgroundEffects && <BackgroundAnimations />}
               <Navigation />
               

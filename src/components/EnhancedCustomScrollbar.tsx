@@ -4,32 +4,31 @@ import { gsap } from 'gsap';
 const EnhancedCustomScrollbar: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const scrollbarRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
   const particlePool = useRef<HTMLDivElement[]>([]);
+  const [isHovered, setIsHovered] = useState(false); // Restored for hover effects
 
   const createParticle = useCallback(() => {
     const particle = document.createElement('div');
     particle.className = 'scrollbar-particle';
     particle.style.left = `${Math.random() * 20 - 10}px`;
     particle.style.animationDelay = `${Math.random() * 2}s`;
+    particle.style.background = 'radial-gradient(circle, #DAA520, transparent)'; // Sawdust color
     return particle;
   }, []);
 
   const updateParticles = useCallback(() => {
     if (!particlesRef.current) return;
     
-    // Create particle trail effect
     const particle = particlePool.current.pop() || createParticle();
     particle.style.bottom = `${scrollProgress}%`;
     particle.style.opacity = '1';
     
     particlesRef.current.appendChild(particle);
     
-    // Remove particle after animation
     setTimeout(() => {
       if (particle.parentNode) {
         particle.parentNode.removeChild(particle);
@@ -39,13 +38,12 @@ const EnhancedCustomScrollbar: React.FC = () => {
   }, [scrollProgress, createParticle]);
 
   const handleScroll = useCallback(() => {
-    const scrollTop = (window as any).getScrollY?.() || window.pageYOffset || document.documentElement.scrollTop;
+    const scrollTop = window.pageYOffset || (window as any).getScrollY?.() || 0;
     const progress = (window as any).getScrollProgress?.() || 0;
     
     setScrollProgress(progress * 100);
     setIsVisible(scrollTop > 50);
     
-    // Update thumb position with smooth animation
     if (thumbRef.current) {
       gsap.to(thumbRef.current, {
         top: `${progress * 100}%`,
@@ -54,7 +52,6 @@ const EnhancedCustomScrollbar: React.FC = () => {
       });
     }
     
-    // Create particles during scroll
     if (Math.random() < 0.3) {
       updateParticles();
     }
@@ -68,7 +65,6 @@ const EnhancedCustomScrollbar: React.FC = () => {
     const scrollbarHeight = rect.height;
     const targetProgress = Math.max(0, Math.min(1, clickY / scrollbarHeight));
     
-    // Use smooth scroll function if available
     if ((window as any).smoothScrollTo) {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       (window as any).smoothScrollTo(targetProgress * maxScroll);
@@ -79,7 +75,6 @@ const EnhancedCustomScrollbar: React.FC = () => {
       });
     }
     
-    // Create click effect
     const clickEffect = document.createElement('div');
     clickEffect.style.position = 'absolute';
     clickEffect.style.top = `${clickY}px`;
@@ -87,7 +82,7 @@ const EnhancedCustomScrollbar: React.FC = () => {
     clickEffect.style.transform = 'translateX(-50%)';
     clickEffect.style.width = '20px';
     clickEffect.style.height = '20px';
-    clickEffect.style.background = 'radial-gradient(circle, var(--electric-indigo), transparent)';
+    clickEffect.style.background = 'radial-gradient(circle, #FFD700, transparent)'; // Golden ripple
     clickEffect.style.borderRadius = '50%';
     clickEffect.style.pointerEvents = 'none';
     clickEffect.style.animation = 'click-ripple 0.6s ease-out forwards';
@@ -116,7 +111,8 @@ const EnhancedCustomScrollbar: React.FC = () => {
       gsap.to(thumbRef.current, {
         width: 12,
         duration: 0.3,
-        ease: 'power2.out'
+        ease: 'power2.out',
+        boxShadow: '0 0 10px #FFD700' // Glowing cutter effect
       });
     }
   }, []);
@@ -136,18 +132,17 @@ const EnhancedCustomScrollbar: React.FC = () => {
       gsap.to(thumbRef.current, {
         width: 8,
         duration: 0.3,
-        ease: 'power2.out'
+        ease: 'power2.out',
+        boxShadow: 'none'
       });
     }
   }, []);
 
   useEffect(() => {
-    // Initialize particle pool
     for (let i = 0; i < 10; i++) {
       particlePool.current.push(createParticle());
     }
     
-    // Add CSS for click ripple effect
     const style = document.createElement('style');
     style.textContent = `
       @keyframes click-ripple {
@@ -159,6 +154,36 @@ const EnhancedCustomScrollbar: React.FC = () => {
           transform: translateX(-50%) scale(3);
           opacity: 0;
         }
+      }
+      .custom-scrollbar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 2px;
+        height: 100%;
+        background: linear-gradient(to bottom, #8B4513, #D2B48C); // Wooden texture
+        transition: opacity 0.3s;
+        opacity: 0;
+      }
+      .custom-scrollbar.visible {
+        opacity: 1;
+      }
+      .custom-scrollbar-thumb {
+        position: absolute;
+        width: 8px;
+        background: #FFD700; // Golden cutter
+        border-radius: 4px;
+      }
+      .scrollbar-particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        animation: fadeOut 2s ease-out;
+      }
+      @keyframes fadeOut {
+        0% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(20px); }
       }
     `;
     document.head.appendChild(style);
@@ -185,30 +210,3 @@ const EnhancedCustomScrollbar: React.FC = () => {
   return (
     <div 
       ref={scrollbarRef}
-      className={`custom-scrollbar ${isVisible ? 'visible' : ''}`}
-    >
-      <div 
-        ref={progressRef}
-        className="custom-scrollbar-progress"
-        style={{ height: `${scrollProgress}%` }}
-      />
-      
-      <div 
-        ref={thumbRef}
-        className="custom-scrollbar-thumb"
-        style={{ 
-          top: `${scrollProgress}%`,
-          height: Math.max(20, (window.innerHeight / Math.max(document.documentElement.scrollHeight, window.innerHeight)) * 100) + '%',
-          transform: 'translateY(-50%)'
-        }}
-      />
-      
-      <div 
-        ref={particlesRef}
-        className="custom-scrollbar-particles"
-      />
-    </div>
-  );
-};
-
-export default EnhancedCustomScrollbar;

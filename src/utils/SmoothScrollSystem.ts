@@ -61,7 +61,13 @@ export class SmoothScrollSystem {
     this.setupSmoothScrolling();
     this.bindEvents();
     this.startRenderLoop();
-  }
+    this.updateScrollBounds(); // Add initial bounds update
+    // Add resize observer for dynamic content
+    const resizeObserver = new ResizeObserver(() => this.updateScrollBounds());
+    if (this.contentElement) {
+        resizeObserver.observe(this.contentElement);
+    }
+}
 
   private setupSmoothScrolling() {
     // Create smooth scroll container
@@ -97,6 +103,12 @@ export class SmoothScrollSystem {
     this.contentElement = this.scrollContainer.firstElementChild as HTMLElement;
     if (this.contentElement) {
       this.contentElement.style.willChange = 'transform';
+    }
+    
+    // Dynamically set body height based on content
+    if (this.contentElement) {
+        const contentHeight = this.contentElement.scrollHeight;
+        document.body.style.height = `${contentHeight}px`;
     }
   }
 
@@ -193,6 +205,7 @@ export class SmoothScrollSystem {
   }
 
   private updateScroll() {
+    this.updateScrollBounds(); // Update bounds each frame
     if (!this.contentElement) return;
     
     const maxScroll = this.getMaxScroll();
@@ -255,10 +268,20 @@ export class SmoothScrollSystem {
   }
 
   private updateScrollBounds() {
-    // Recalculate max scroll on resize
-    const maxScroll = this.getMaxScroll();
-    this.targetScroll = Math.min(this.targetScroll, maxScroll);
+    if (this.container) {
+        this.maxScroll = this.container.scrollHeight - window.innerHeight;
+        document.body.style.height = `${this.container.scrollHeight}px`;
+    }
   }
+
+  // In constructor or init method
+  constructor() {
+    // Add resize observer for dynamic content
+    const resizeObserver = new ResizeObserver(() => this.updateScrollBounds());
+    if (this.contentElement) {
+        resizeObserver.observe(this.contentElement);
+    }
+}
 
   public scrollTo(target: number | string | HTMLElement, options: { duration?: number; ease?: string } = {}) {
     const { duration = 1.2, ease = 'power2.out' } = options;
