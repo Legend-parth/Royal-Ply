@@ -19,7 +19,7 @@ interface ScrollCallback {
   priority: number;
 }
 
-export class SmoothScrollSystem {
+class SmoothScrollSystem {
   private static instance: SmoothScrollSystem;
   private callbacks: ScrollCallback[] = [];
   private state: ScrollState = {
@@ -268,18 +268,9 @@ export class SmoothScrollSystem {
   }
 
   private updateScrollBounds() {
-    if (this.container) {
-        this.maxScroll = this.container.scrollHeight - window.innerHeight;
-        document.body.style.height = `${this.container.scrollHeight}px`;
-    }
-  }
-
-  // In constructor or init method
-  constructor() {
-    // Add resize observer for dynamic content
-    const resizeObserver = new ResizeObserver(() => this.updateScrollBounds());
-    if (this.contentElement) {
-        resizeObserver.observe(this.contentElement);
+    if (this.scrollContainer) {
+        document.body.style.height = `${this.scrollContainer.scrollHeight}px`;
+        document.body.style.height = `${this.scrollContainer.scrollHeight}px`;
     }
 }
 
@@ -352,6 +343,10 @@ export class SmoothScrollSystem {
     document.body.style.height = '';
     document.body.style.overflow = '';
   }
+
+  public getScrollPosition(): number {
+    return this.scrollContainer ? this.scrollContainer.scrollTop : 0;
+}
 }
 
 export const smoothScrollSystem = SmoothScrollSystem.getInstance();
